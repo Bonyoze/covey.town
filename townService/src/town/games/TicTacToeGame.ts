@@ -86,22 +86,21 @@ export default class TicTacToeGame extends Game<TicTacToeGameState, TicTacToeMov
   }
 
   private _validateMove(move: TicTacToeMove) {
+    // A move is valid only if game is in progress
+    if (this.state.status !== 'IN_PROGRESS') {
+      throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
+    }
+
+    // A move is only valid if it is the player's turn
+    if (move.gamePiece !== this.state.turn) {
+      throw new InvalidParametersError(MOVE_NOT_YOUR_TURN_MESSAGE);
+    }
+
     // A move is valid if the space is empty
     for (const m of this.state.moves) {
       if (m.col === move.col && m.row === move.row) {
         throw new InvalidParametersError(BOARD_POSITION_NOT_EMPTY_MESSAGE);
       }
-    }
-
-    // A move is only valid if it is the player's turn
-    if (move.gamePiece === 'X' && this.state.moves.length % 2 === 1) {
-      throw new InvalidParametersError(MOVE_NOT_YOUR_TURN_MESSAGE);
-    } else if (move.gamePiece === 'O' && this.state.moves.length % 2 === 0) {
-      throw new InvalidParametersError(MOVE_NOT_YOUR_TURN_MESSAGE);
-    }
-    // A move is valid only if game is in progress
-    if (this.state.status !== 'IN_PROGRESS') {
-      throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
     }
   }
 
@@ -109,8 +108,28 @@ export default class TicTacToeGame extends Game<TicTacToeGameState, TicTacToeMov
     this.state = {
       ...this.state,
       moves: [...this.state.moves, move],
+      turn: this.getNextTurn(),
     };
     this._checkForGameEnding();
+  }
+
+  public getNextTurn(): 'X' | 'O' | undefined {
+    if (this.state.status === 'IN_PROGRESS') {
+      switch (this.state.turn) {
+        case undefined:
+        case 'O':
+          return 'X';
+        case 'X':
+          return 'O';
+        default:
+          return undefined;
+      }
+    }
+    return undefined;
+  }
+
+  public skipMove(): void {
+    this.state.turn = this.getNextTurn();
   }
 
   /*
@@ -179,6 +198,7 @@ export default class TicTacToeGame extends Game<TicTacToeGameState, TicTacToeMov
     if (this.state.x && this.state.o) {
       this.state = {
         ...this.state,
+        turn: 'X',
         status: 'IN_PROGRESS',
       };
     }
@@ -203,22 +223,16 @@ export default class TicTacToeGame extends Game<TicTacToeGameState, TicTacToeMov
     if (this.state.o === undefined) {
       this.state = {
         moves: [],
+        turn: undefined,
         status: 'WAITING_TO_START',
       };
       return;
     }
-    if (this.state.x === player.id) {
-      this.state = {
-        ...this.state,
-        status: 'OVER',
-        winner: this.state.o,
-      };
-    } else {
-      this.state = {
-        ...this.state,
-        status: 'OVER',
-        winner: this.state.x,
-      };
-    }
+    this.state = {
+      ...this.state,
+      turn: undefined,
+      status: 'OVER',
+      winner: this.state.x === player.id ? this.state.o : this.state.x,
+    };
   }
 }
