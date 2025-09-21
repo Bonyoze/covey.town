@@ -116,7 +116,6 @@ export interface TicTacToeMove {
  */
 export interface TicTacToeGameState extends WinnableGameState {
   moves: ReadonlyArray<TicTacToeMove>;
-	turn?: 'X' | 'O',
   x?: PlayerID;
   o?: PlayerID;
 }
