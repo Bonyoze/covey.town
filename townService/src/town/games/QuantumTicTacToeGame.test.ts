@@ -98,7 +98,7 @@ describe('QuantumTicTacToeGame', () => {
 
     it('should throw an error if the game is not in progress', () => {
       game.leave(player1);
-      expect(() => makeMove(player2, 'A', 0, 0)).toThrow();
+      expect(() => makeMove(player2, 'A', 0, 0)).toThrowError('Game is not in progress');
     });
 
     it('should throw an error if a player tries to play on their own piece', () => {
@@ -153,11 +153,11 @@ describe('QuantumTicTacToeGame', () => {
         makeMove(player1, 'A', 0, 1); // X
         makeMove(player2, 'B', 0, 1); // O
         makeMove(player1, 'A', 0, 2); // X -> scores 1 point
-
+        expect(game.state.xScore).toBe(1);
         expect(() => makeMove(player2, 'A', 1, 0)).toThrow('Invalid move');
       });
 
-      it('should end the game when all boards are full or won (X wins)', () => {
+      it('should end the game when all boards are full or won (X wins, xScore = 2, oScore = 1)', () => {
         // X gets a win on board A
         makeMove(player1, 'A', 0, 0); // X
         makeMove(player2, 'B', 0, 0); // O
@@ -179,7 +179,7 @@ describe('QuantumTicTacToeGame', () => {
         expect(game.state.winner).toBe(player1.id);
       });
 
-      it('should end the game when all boards are full or won (X wins)', () => {
+      it('should end the game when all boards are full or won (X wins, xScore = 2, oScore = 0)', () => {
         // X gets a win on board A
         makeMove(player1, 'A', 0, 0); // X
         makeMove(player2, 'B', 0, 0); // O
@@ -209,7 +209,42 @@ describe('QuantumTicTacToeGame', () => {
         expect(game.state.winner).toBe(player1.id);
       });
 
-      it('should end the game when all boards are full or won (O wins)', () => {
+      it('should end the game when all boards are full', () => {
+        makeMove(player1, 'A', 0, 0);
+        makeMove(player2, 'B', 0, 0);
+        makeMove(player1, 'C', 0, 0);
+        makeMove(player2, 'A', 0, 1);
+        makeMove(player1, 'B', 0, 1);
+        makeMove(player2, 'C', 0, 1);
+        makeMove(player1, 'A', 0, 2);
+        makeMove(player2, 'B', 0, 2);
+        makeMove(player1, 'C', 0, 2);
+        makeMove(player2, 'A', 1, 1);
+        makeMove(player1, 'B', 1, 1);
+        makeMove(player2, 'C', 1, 1);
+        makeMove(player1, 'A', 1, 0);
+        makeMove(player2, 'B', 1, 0);
+        makeMove(player1, 'C', 1, 0);
+        makeMove(player2, 'A', 2, 0);
+        makeMove(player1, 'B', 2, 0);
+        makeMove(player2, 'C', 2, 0);
+        makeMove(player1, 'A', 1, 2);
+        makeMove(player2, 'B', 1, 2);
+        makeMove(player1, 'C', 1, 2);
+        makeMove(player2, 'A', 2, 2);
+        makeMove(player1, 'B', 2, 2);
+        makeMove(player2, 'C', 2, 2);
+        makeMove(player1, 'A', 2, 1);
+        makeMove(player2, 'B', 2, 1);
+        makeMove(player1, 'C', 2, 1);
+
+        expect(game.state.status).toBe('OVER');
+        expect(game.state.xScore).toBe(0);
+        expect(game.state.oScore).toBe(0);
+        expect(game.state.winner).toBe(undefined);
+      });
+
+      it('should end the game when all boards are full or won (O wins, xScore = 1, oScore = 2)', () => {
         // X gets a win on board A
         makeMove(player1, 'A', 0, 0); // X
         makeMove(player2, 'B', 0, 0); // O

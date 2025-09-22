@@ -67,7 +67,7 @@ export default class QuantumTicTacToeGameArea extends GameArea<QuantumTicTacToeG
       if (!game) {
         throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
       }
-      if (this._game?.id !== command.gameID) {
+      if (game?.id !== command.gameID) {
         throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
       }
       assert(
@@ -75,6 +75,10 @@ export default class QuantumTicTacToeGameArea extends GameArea<QuantumTicTacToeG
         'Invalid game piece',
       );
       assert('board' in command.move, 'Invalid board');
+      assert(
+        command.move.board === 'A' || command.move.board === 'B' || command.move.board === 'C',
+        'Invalid board',
+      );
       game.applyMove({
         gameID: command.gameID,
         playerID: player.id,
@@ -99,7 +103,7 @@ export default class QuantumTicTacToeGameArea extends GameArea<QuantumTicTacToeG
       if (!game) {
         throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
       }
-      if (this._game?.id !== command.gameID) {
+      if (game?.id !== command.gameID) {
         throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
       }
       game.leave(player);
